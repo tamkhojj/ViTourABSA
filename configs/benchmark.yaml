@@ -1,0 +1,51 @@
+# Benchmark configuration used in the paper (the "trimmed" plan).
+# scripts/07_run_benchmark.py reads this file. Remove or add names in the *_run lists to change what is run.
+
+seeds:
+  base: [1, 2, 3, 4, 5]        # base encoders, prior-random baseline
+  aux: [1, 2, 3]               # large encoders, variants, shift splits, learning curve, leakage
+
+max_train: 0                   # 0 = full training set; a positive number subsamples (quick tests)
+
+# name: [Hugging Face id, extra training settings, learning-rate grid, seed group]
+encoders:
+  phobert_base:  ['vinai/phobert-base-v2',        {batch_size: 32},                [2.0e-5, 3.0e-5], base]
+  visobert:      ['uitnlp/visobert',              {batch_size: 32},                [2.0e-5, 3.0e-5], base]
+  xlmr_base:     ['FacebookAI/xlm-roberta-base',  {batch_size: 32},                [2.0e-5, 3.0e-5], base]
+  mdeberta_base: ['microsoft/mdeberta-v3-base',   {batch_size: 32},                [2.0e-5, 3.0e-5], base]
+  phobert_large: ['vinai/phobert-large',          {batch_size: 16, grad_accum: 2}, [1.0e-5, 2.0e-5], aux]
+  xlmr_large:    ['FacebookAI/xlm-roberta-large', {batch_size: 16, grad_accum: 2}, [1.0e-5, 2.0e-5], aux]
+
+# variants of an encoder; the learning rate chosen for the base encoder on S1 is reused
+variants:
+  phobert_base_pair:         {encoder: phobert_base, mode: pair, epochs: 5, patience: 2}
+  phobert_base_coral:        {encoder: phobert_base, head: coral}
+  phobert_base_weighted:     {encoder: phobert_base, loss: weighted}
+  phobert_base_logit_adjust: {encoder: phobert_base, loss: logit_adjust}
+  xlmr_large_pair:           {encoder: xlmr_large, mode: pair, epochs: 4, patience: 2}
+
+seq2seq:                       # name: [Hugging Face id, learning rate]
+  vit5_base: ['VietAI/vit5-base', 3.0e-4]
+seq2seq_seeds: [1]
+seq2seq_epochs: 8
+
+llms:
+  qwen25_7b: Qwen/Qwen2.5-7B-Instruct
+  qwen25_3b: Qwen/Qwen2.5-3B-Instruct
+  llama31_8b: meta-llama/Llama-3.1-8B-Instruct
+  aya_expanse_8b: CohereLabs/aya-expanse-8b
+  vistral_7b: Viet-Mistral/Vistral-7B-Chat
+llm_modes: [zero, few]         # prompting settings run for every LLM on S1
+qlora_run: [qwen25_7b, vistral_7b]
+llm_limit: 0                   # >0 evaluates only the first N test reviews (quick checks)
+llm_extra_args: []             # extra arguments for vitourabsa.models.llm_infer, e.g. ['--backend', 'hf']
+qlora_extra_args: []
+
+# generalisation, learning curve and leakage
+shift_encoders: [phobert_base, xlmr_large]   # S2 and S4
+llm_on_s2: [qwen25_7b]                       # zero-shot LLM on S2 (sanity check: needs no training)
+lopo_encoders: [phobert_base]                # S3, one seed
+lopo_seeds: [1]
+lc_encoders: [phobert_base]                  # S5
+lc_fractions: ['0.01', '0.05', '0.1', '0.25', '0.5']
+leakage_encoders: [phobert_base]             # S6

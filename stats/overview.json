@@ -1,0 +1,12 @@
+{
+ "reviews": 87314,
+ "train": 69851,
+ "val": 8729,
+ "test": 8734,
+ "provinces": 9,
+ "facility types": 3,
+ "aspects": 10,
+ "polar aspect opinions": 259814,
+ "mean length (syllables)": 38.9,
+ "median length": 24
+}

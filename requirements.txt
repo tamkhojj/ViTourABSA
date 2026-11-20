@@ -1,0 +1,21 @@
+# Python >= 3.10. Install PyTorch for your CUDA version first: https://pytorch.org/get-started/locally/
+torch>=2.1
+transformers>=4.45
+accelerate
+peft>=0.12
+bitsandbytes            # QLoRA (4-bit); Linux + NVIDIA GPU
+sentencepiece
+protobuf
+tiktoken
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+pyyaml
+pyvi                    # Vietnamese word segmentation (PhoBERT input)
+datasketch              # MinHash near-duplicate detection (only for --from-raw)
+iterative-stratification
+krippendorff
+openpyxl
+# optional, faster LLM inference: vllm
